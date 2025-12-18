@@ -208,7 +208,7 @@
         textarea.save-key {
             width: 100%; height: 100px; background: #f0f2f5; border: 3px solid #ddd;
             border-radius: 15px; padding: 10px; font-family: monospace; font-size: 14px;
-            margin: 20px 0; resize: none;
+            margin: 20px 0; resize: none; color: #333;
         }
 
         /* RANK LIST */
@@ -350,8 +350,8 @@
             <p style="color:#888; margin-bottom:10px;">Copy key to save, Paste to load.</p>
             <textarea id="save-key" class="save-key" placeholder="Paste Save Key Here..."></textarea>
             <div style="display:flex; gap:10px;">
-                <button class="btn-play" style="position:static; width:50%; font-size:20px; background:#ddd; color:#333; box-shadow:0 5px 0 #bbb;" onclick="DataMenu.copy()">COPY</button>
-                <button class="btn-play" style="position:static; width:50%; font-size:20px;" onclick="DataMenu.load()">LOAD</button>
+                <button class="btn-play" style="position:static; width:50%; font-size:20px; background:#ddd; color:#333; box-shadow:0 5px 0 #bbb;" onclick="DataMenu.copy()">COPY KEY</button>
+                <button class="btn-play" style="position:static; width:50%; font-size:20px;" onclick="DataMenu.load()">LOAD KEY</button>
             </div>
         </div>
     </div>
@@ -381,10 +381,10 @@ const RARITY = {
 };
 
 const ABILITIES = {
-    dash: { id: 'dash', name: 'DASH', icon: '👟', rarity: 'common', cd: 180, dur: 20 },
-    ghost: { id: 'ghost', name: 'GHOST', icon: '👻', rarity: 'rare', cd: 600, dur: 120 },
-    magnet: { id: 'magnet', name: 'MAGNET', icon: '🧲', rarity: 'epic', cd: 480, dur: 120 },
-    repel: { id: 'repel', name: 'REPEL', icon: '🛡️', rarity: 'legendary', cd: 300, dur: 20 }
+    dash: { id: 'dash', name: 'DASH', icon: '👟', rarity: 'common', cd: 60, dur: 15 },
+    ghost: { id: 'ghost', name: 'GHOST', icon: '👻', rarity: 'rare', cd: 180, dur: 60 },
+    magnet: { id: 'magnet', name: 'MAGNET', icon: '🧲', rarity: 'epic', cd: 120, dur: 30 },
+    repel: { id: 'repel', name: 'REPEL', icon: '🛡️', rarity: 'legendary', cd: 90, dur: 10 }
 };
 
 const SKINS = [
@@ -436,7 +436,7 @@ const Save = {
         return {i:0, ...RANK_DEF[0]};
     },
     exportKey() { return btoa(JSON.stringify(this.data)); },
-    doImport(s) { 
+    importKey(s) { 
         try { 
             const d = JSON.parse(atob(s)); 
             if(d.coins !== undefined) { this.data = d; this.save(); return true; } 
@@ -482,7 +482,7 @@ const Preview = {
 function drawFace(ctx, x, y, r, type) {
     ctx.fillStyle = 'black';
     if(type === 'classic') { ctx.beginPath(); ctx.arc(x-15, y, 5, 0, 6.28); ctx.arc(x+15, y, 5, 0, 6.28); ctx.fill(); }
-    else if (type === 'angry') { ctx.strokeStyle = 'black'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x-20, y-10); ctx.lineTo(x-5, y+5); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x+20, y-10); ctx.lineTo(x+5, y+5); ctx.stroke(); }
+    else if (type === 'angry') { ctx.strokeStyle = 'black'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x-20, y-10); ctx.lineTo(x-5, y+5); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x+20, y-10); ctx.lineTo(x+5, y+8); ctx.stroke(); }
     else if (type === 'ninja') { ctx.fillStyle = '#cc0000'; ctx.fillRect(x-r+5, y-15, r*2-10, 15); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x-15, y, 4, 0, 6.28); ctx.arc(x+15, y, 4, 0, 6.28); ctx.fill(); }
     else if (type === 'money') { ctx.fillStyle = '#006600'; ctx.font = 'bold 30px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('$$', x, y+5); }
     else if (type === 'king') { ctx.fillStyle = 'gold'; ctx.beginPath(); ctx.moveTo(x-20, y-25); ctx.lineTo(x-10, y-10); ctx.lineTo(x, y-30); ctx.lineTo(x+10, y-10); ctx.lineTo(x+20, y-25); ctx.lineTo(x+20, y-5); ctx.lineTo(x-20, y-5); ctx.fill(); ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(x-10, y+10, 4, 0, 6.28); ctx.arc(x+10, y+10, 4, 0, 6.28); ctx.fill(); }
@@ -491,7 +491,7 @@ function drawFace(ctx, x, y, r, type) {
     else if (type === 'derp') { ctx.beginPath(); ctx.arc(x-15, y-5, 6, 0, 6.28); ctx.arc(x+15, y+5, 4, 0, 6.28); ctx.fill(); }
     else if (type === 'chill') { ctx.fillStyle='black'; ctx.fillRect(x-20, y-5, 40, 10); ctx.strokeStyle='black'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x-20, y); ctx.lineTo(x-25, y-5); ctx.stroke(); }
     else if (type === 'robot') { ctx.fillStyle='#00ff00'; ctx.fillRect(x-20, y-5, 15, 10); ctx.fillRect(x+5, y-5, 15, 10); }
-    else if (type === 'pumpkin') { ctx.fillStyle='black'; ctx.beginPath(); ctx.moveTo(x-15,y); ctx.lineTo(x-5,y); ctx.lineTo(x-10,y-10); ctx.fill(); ctx.beginPath(); ctx.moveTo(x+5,y); ctx.lineTo(x+15,y); ctx.lineTo(x+10,y-10); ctx.fill(); ctx.beginPath(); ctx.arc(x, y+10, 10, 0, 3.14); ctx.fill(); }
+    else if (type === 'pumpkin') { ctx.fillStyle='black'; ctx.beginPath(); ctx.moveTo(x-15,y); ctx.lineTo(x-5,y); ctx.lineTo(x-10,y-10); ctx.fill(); ctx.beginPath(); ctx.moveTo(x+5,y); ctx.lineTo(x+15,y); ctx.lineTo(x+10,y-10); ctx.fill(); ctx.beginPath(); ctx.arc(x, y+15, 12, 0, 3.14); ctx.fill(); }
     else if (type === 'demon') { ctx.fillStyle='black'; ctx.beginPath(); ctx.moveTo(x-20, y-15); ctx.lineTo(x-5, y+5); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x+20, y-15); ctx.lineTo(x+5, y+5); ctx.stroke(); ctx.fillStyle='red'; ctx.beginPath(); ctx.arc(x-10, y, 2, 0, 6.28); ctx.arc(x+10, y, 2, 0, 6.28); ctx.fill(); }
 }
 
@@ -605,14 +605,12 @@ const RankMenu = {
             el.className = `rank-row ${isUnlocked ? 'unlocked' : 'locked'} ${isNext ? 'current' : ''}`;
             if(isNext) foundCurrent = true;
 
-            // Updated Icons Logic for 3 per tier
-            // Bronze: 0-2 (Tier 0), Silver: 3-5 (Tier 1), Gold: 6-8 (Tier 2), Diamond: 9-11 (Tier 3), Master: 12 (Tier 4), GM: 13, God: 14
             let tierIdx = 0;
-            if (idx < 3) tierIdx = 0; // Bronze
-            else if (idx < 6) tierIdx = 1; // Silver
-            else if (idx < 9) tierIdx = 2; // Gold
-            else if (idx < 12) tierIdx = 3; // Diamond
-            else tierIdx = 4; // Master+ (capped at icon 4)
+            if (idx < 3) tierIdx = 0; 
+            else if (idx < 6) tierIdx = 1; 
+            else if (idx < 9) tierIdx = 2; 
+            else if (idx < 12) tierIdx = 3; 
+            else tierIdx = 4;
 
             const icons = ['🥉','🥈','🥇','💠','👑'];
 
@@ -627,7 +625,6 @@ const RankMenu = {
             list.appendChild(el);
         });
         
-        // Progress bar logic
         const r = Save.getRank();
         const next = RANK_DEF[r.i+1] || {xp: r.xp*1.5};
         const pct = Math.min(100, Math.max(0, (currentXP - r.xp) / (next.xp - r.xp) * 100));
@@ -637,10 +634,10 @@ const RankMenu = {
 };
 
 const DataMenu = {
-    open() { Game.toggleLayer('data-menu', true); document.getElementById('btn-battle').classList.add('disabled'); document.getElementById('save-key').value = ""; },
+    open() { Game.toggleLayer('data-menu', true); document.getElementById('btn-battle').classList.add('disabled'); document.getElementById('save-key').value = Save.exportKey(); },
     close() { Game.toggleLayer('data-menu', false); document.getElementById('btn-battle').classList.remove('disabled'); },
-    copy() { const ta = document.getElementById('save-key'); ta.value = Save.getExport(); ta.select(); document.execCommand('copy'); alert("Copied to clipboard!"); },
-    load() { const val = document.getElementById('save-key').value.trim(); if(Save.doImport(val)) { alert("Data Loaded!"); Menu.updateStats(); Menu.renderGrid(Menu.tab); DataMenu.close(); } else { alert("Invalid Key"); } }
+    copy() { const ta = document.getElementById('save-key'); ta.value = Save.exportKey(); ta.select(); document.execCommand('copy'); alert("Copied to clipboard!"); },
+    load() { const val = document.getElementById('save-key').value.trim(); if(Save.importKey(val)) { alert("Data Loaded!"); Menu.updateStats(); Menu.renderGrid(Menu.tab); DataMenu.close(); } else { alert("Invalid Key"); } }
 };
 
 // --- AUDIO ---
@@ -673,8 +670,7 @@ const Game = {
     colors: ['#ff4466', '#ffaa00', '#00cc66', '#4488ff', '#aa44ff'],
     mapRadius: 1400,
     state: 'MENU', units: [], pickups: [], particles: [], coins: [],
-    cam: {x:0, y:0, z:0.9}, // Slightly lower zoom for better view
-    player: null, input: {x:0, y:0, active:false},
+    cam: {x:0, y:0, z:1.0}, player: null, input: {x:0, y:0, active:false},
     shake: 0, kills: 0, runCoins: 0, endingTimer: 0,
 
     init() {
@@ -903,6 +899,7 @@ const Game = {
     startEndingSequence() {
         if(this.state==='ENDING') return;
         this.state = 'ENDING'; this.endingTimer = 0; this.shake = 0; GameAudio.sfxWin();
+        // Spawn confetti or similar effects
     },
     
     endGame(win) {
